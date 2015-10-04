@@ -1,0 +1,14 @@
+{
+    "name": "davide-romanini/blob-store",
+    "description": "Simple binary object store abstraction",
+    "authors": [
+        {
+            "name": "Davide Romanini",
+            "email": "davide.romanini@gmail.com"
+        }
+    ],
+    "require": {
+        "ramsey/uuid": "3.0.0",
+        "psr/http-message": "1.0"
+    }
+}
