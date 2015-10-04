@@ -10,5 +10,10 @@
     "require": {
         "ramsey/uuid": "3.0.0",
         "psr/http-message": "1.0"
+    },
+    "autoload" : {
+		"psr-0" : {
+			"BlobStore\\" : "src/"
+        }
     }
 }
