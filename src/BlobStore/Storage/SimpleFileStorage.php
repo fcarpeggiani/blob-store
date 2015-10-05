@@ -2,12 +2,16 @@
 
 namespace BlobStore\Storage;
 
+use Exception;
+use GuzzleHttp\Psr7\LazyOpenStream;
+use Psr\Http\Message\StreamInterface;
+
 /**
  * Stores data in a common directory
  *
  * @author davide
  */
-class SimpleFileStorage implements \BlobStore\Storage\StorageInterface
+class SimpleFileStorage implements StorageInterface
 {
     /**
      *
@@ -28,7 +32,7 @@ class SimpleFileStorage implements \BlobStore\Storage\StorageInterface
         $this->nestingLevel = $nestingLevel;
     }
 
-    public function saveData($id, \Psr\Http\Message\StreamInterface $data)
+    public function saveData($id, StreamInterface $data)
     {
         // FIXME: with high load there are concurrency issues I think
         $tries = 0;
@@ -39,7 +43,7 @@ class SimpleFileStorage implements \BlobStore\Storage\StorageInterface
           $tries++;
         } while(!$ok && $tries < 5);
         if(! $ok) {
-            throw new \Exception("Cannot write $filename in " . $this->prefix);
+            throw new Exception("Cannot write $filename in " . $this->prefix);
         }
         $filedir = dirname($filename);
         if($filedir != '.') {
@@ -49,7 +53,7 @@ class SimpleFileStorage implements \BlobStore\Storage\StorageInterface
         // to overwrite it at least!
         $f = @fopen($dest, 'x+');
         if ($f === FALSE) {
-            throw new \Exception("Cannot write $dest. Maybe another process created it concurrently.");
+            throw new Exception("Cannot write $dest. Maybe another process created it concurrently.");
         }
         $f = \GuzzleHttp\Psr7\stream_for($f);
         \GuzzleHttp\Psr7\copy_to_stream($data, $f);
@@ -79,6 +83,7 @@ class SimpleFileStorage implements \BlobStore\Storage\StorageInterface
     {
         $filename = $this->prefix . DIRECTORY_SEPARATOR . $storageKey;
         assert(is_readable($filename), "$filename does not exists!");
-        return new \GuzzleHttp\Psr7\LazyOpenStream($filename, 'r');
+        // don't open the file now, file descriptors are not infinite!
+        return new LazyOpenStream($filename, 'r');
     }
 }
