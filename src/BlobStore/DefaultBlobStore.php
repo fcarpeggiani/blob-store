@@ -24,7 +24,7 @@ class DefaultBlobStore implements BlobStoreInterface
 
     public function put($data, $metadata)
     {
-        $uuid = Uuid::uuid4();
+        $uuid = (string)Uuid::uuid4();
         $storageKey = $this->storage->saveData($uuid, $data);
         $metadata[self::STORAGE_KEY_ATTR] = $storageKey;
         $this->metadataRepo->saveMetadata($uuid, $metadata);

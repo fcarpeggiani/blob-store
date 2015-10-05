@@ -34,6 +34,13 @@ class Blob
         return $this->data;
     }
 
+    function getDataAsString()
+    {
+        $data = stream_get_contents($this->getData());
+        rewind($this->getData());
+        return $data;
+    }
+
     function getMetadata()
     {
         return $this->metadata;

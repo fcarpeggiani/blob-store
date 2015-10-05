@@ -51,4 +51,35 @@ class BlobStoreTest extends \PHPUnit_Framework_TestCase
         $get = $m->findBy(['unknown' => 'daisy']);
         $this->assertCount(0, $get);
     }
+
+    /**
+     * @test
+     */
+    public function defaultStore()
+    {
+        $config = new \Doctrine\DBAL\Configuration();
+        $connectionParams = array(
+            'url' => 'sqlite:///:memory:',
+        );
+        $conn = \Doctrine\DBAL\DriverManager::getConnection($connectionParams, $config);
+        $conn->executeUpdate(file_get_contents(__DIR__ . '/../../metadata_db.sql'));
+        $m = new Metadata\DBALMetadataRepo($conn);
+
+        $storage = new Storage\SimpleFileStorage(__DIR__);
+        $expected = file_get_contents(__FILE__);
+        $f = fopen(__FILE__, 'r');
+
+        $store = new DefaultBlobStore($storage, $m);
+
+        $blob = $store->put($f, ['foo' => 'bar']);
+        $this->assertEquals($blob->getMetadata()['foo'], 'bar');
+        $this->assertNotNull($blob->getId());
+        $this->assertEquals($expected, $blob->getDataAsString());
+
+        $uuid = $blob->getId();
+        $blob = $store->get($uuid);
+        $this->assertEquals($blob->getMetadata()['foo'], 'bar');
+        $this->assertNotNull($blob->getId());
+        $this->assertEquals($expected, $blob->getDataAsString());
+    }
 }

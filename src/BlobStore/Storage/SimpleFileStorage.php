@@ -52,6 +52,7 @@ class SimpleFileStorage implements \BlobStore\Storage\StorageInterface
             throw new \Exception("Cannot write $dest. Maybe another process created it concurrently.");
         }
         stream_copy_to_stream($data, $f);
+        rewind($data);
         fclose($f);
 
         return $filename;
