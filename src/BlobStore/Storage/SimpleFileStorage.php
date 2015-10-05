@@ -28,7 +28,7 @@ class SimpleFileStorage implements \BlobStore\Storage\StorageInterface
         $this->nestingLevel = $nestingLevel;
     }
 
-    public function saveData($id, $data)
+    public function saveData($id, \Psr\Http\Message\StreamInterface $data)
     {
         // FIXME: with high load there are concurrency issues I think
         $tries = 0;
@@ -47,13 +47,14 @@ class SimpleFileStorage implements \BlobStore\Storage\StorageInterface
         }
         // if another process created the same file in the meanwhile, we don't want
         // to overwrite it at least!
-        $f = @fopen($dest, 'x');
+        $f = @fopen($dest, 'x+');
         if ($f === FALSE) {
             throw new \Exception("Cannot write $dest. Maybe another process created it concurrently.");
         }
-        stream_copy_to_stream($data, $f);
-        rewind($data);
-        fclose($f);
+        $f = \GuzzleHttp\Psr7\stream_for($f);
+        \GuzzleHttp\Psr7\copy_to_stream($data, $f);
+        $f->close();
+        $data->rewind();
 
         return $filename;
     }
@@ -78,6 +79,6 @@ class SimpleFileStorage implements \BlobStore\Storage\StorageInterface
     {
         $filename = $this->prefix . DIRECTORY_SEPARATOR . $storageKey;
         assert(is_readable($filename), "$filename does not exists!");
-        return fopen($filename, 'r');
+        return new \GuzzleHttp\Psr7\LazyOpenStream($filename, 'r');
     }
 }

@@ -15,7 +15,7 @@ class Blob
     private $id;
 
     /**
-     * @var resource
+     * @var StreamInterface
      */
     private $data;
 
@@ -29,16 +29,27 @@ class Blob
         return $this->id;
     }
 
+    /**
+     *
+     * @return resource
+     */
     function getData()
     {
-        return $this->data;
+        return \GuzzleHttp\Psr7\StreamWrapper::getResource($this->data);
     }
 
     function getDataAsString()
+    {        
+        return (string)$this->data;
+    }
+
+    /**
+     *
+     * @return StreamInterface
+     */
+    function getDataAsPsr7Stream()
     {
-        $data = stream_get_contents($this->getData());
-        rewind($this->getData());
-        return $data;
+        return $this->data;
     }
 
     function getMetadata()
@@ -51,7 +62,7 @@ class Blob
         $this->id = $id;
     }
 
-    function setData($data)
+    function setDataAsPsr7Stream(\Psr\Http\Message\StreamInterface $data)
     {
         $this->data = $data;
     }

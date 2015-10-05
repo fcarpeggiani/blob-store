@@ -24,13 +24,15 @@ class DefaultBlobStore implements BlobStoreInterface
 
     public function put($data, $metadata)
     {
+        $data = \GuzzleHttp\Psr7\stream_for($data);
+
         $uuid = (string)Uuid::uuid4();
         $storageKey = $this->storage->saveData($uuid, $data);
         $metadata[self::STORAGE_KEY_ATTR] = $storageKey;
         $this->metadataRepo->saveMetadata($uuid, $metadata);
         $blob = new Blob();
         $blob->setId($uuid);
-        $blob->setData($data);
+        $blob->setDataAsPsr7Stream($data);
         $blob->setMetadata($metadata);
         
         return $blob;
@@ -47,7 +49,7 @@ class DefaultBlobStore implements BlobStoreInterface
             $data = $this->storage->getData($metadata[self::STORAGE_KEY_ATTR]);
             $blob = new Blob();
             $blob->setId($id);
-            $blob->setData($data);
+            $blob->setDataAsPsr7Stream($data);
             $blob->setMetadata($metadata);
 
             return $blob;
@@ -55,8 +57,28 @@ class DefaultBlobStore implements BlobStoreInterface
         return null;
     }
 
+    /**
+     *
+     * @param array filter on metadata
+     *
+     * @return Blob[]
+     */
     public function findBy($criteria)
     {
-        
+        assert(count(array_filter($criteria)) > 0, 'Criteria cannot be empty');
+        $metadata = $this->metadataRepo->findBy($criteria);
+        // all in memory for now.. mainly intended to find small subsets of files based on some domain specific metadata
+        $ret = [];
+        foreach ($metadata as $uuid => $metadata) {
+            assert(isset($metadata[self::STORAGE_KEY_ATTR]), "DefaultBlobStore: $uuid metadata corrupted, cannot find storage key");
+            $data = $this->storage->getData($metadata[self::STORAGE_KEY_ATTR]);
+            $blob = new Blob();
+            $blob->setId($uuid);
+            $blob->setMetadata($metadata);
+            $blob->setDataAsPsr7Stream($data);
+
+            $ret[] = $blob;
+        }
+        return $ret;
     }
 }
