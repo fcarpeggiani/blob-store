@@ -40,3 +40,4 @@ Currently implemented:
    when filtering on small subsets of the whole repository (eg: all attachments
    associated to a specific domain object).
 
+ - currently it is *insert only*. Neither updates nor deletes are implemented. 
