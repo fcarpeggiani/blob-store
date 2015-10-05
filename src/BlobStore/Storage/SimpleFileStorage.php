@@ -65,7 +65,7 @@ class SimpleFileStorage implements \BlobStore\Storage\StorageInterface
         $n = '';
         for($i = 0; $i < 40; $i++) {
             $n .= mt_rand(0, 9);
-            if ($nestingLevel-- > $i) {
+            if ($nestingLevel > $i) {
                 $n .= DIRECTORY_SEPARATOR;
             }
         }

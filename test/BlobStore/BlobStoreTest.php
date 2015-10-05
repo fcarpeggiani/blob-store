@@ -5,7 +5,7 @@ namespace BlobStore;
 class BlobStoreTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @test
+     * -----test
      */
     public function storeData()
     {
@@ -17,6 +17,38 @@ class BlobStoreTest extends \PHPUnit_Framework_TestCase
         $data = file_get_contents(__FILE__);
         $retrievedData = stream_get_contents($storage->getData($key));
         $this->assertEquals($retrievedData, $data);
-        //unlink(__DIR__ . DIRECTORY_SEPARATOR . $key);
+        unlink(__DIR__ . DIRECTORY_SEPARATOR . $key);
+    }
+
+    /**
+     * @test
+     */
+    public function storeMetadata()
+    {
+        $config = new \Doctrine\DBAL\Configuration();
+        $connectionParams = array(
+            'url' => 'sqlite:///:memory:',
+        );
+        $conn = \Doctrine\DBAL\DriverManager::getConnection($connectionParams, $config);
+        $conn->executeUpdate(file_get_contents(__DIR__ . '/../../metadata_db.sql'));
+        $m = new Metadata\DBALMetadataRepo($conn);
+        $m->saveMetadata('xxxxxx', [
+            'foo' => 'bar',
+            'goofy' => 'mickey',
+            'donald' => 'daisy'
+        ]);
+        $get = $m->findBy(['uuid' => 'xxxxxx']);
+        $this->assertCount(1, $get);
+        $this->assertEquals($get['xxxxxx']['foo'], 'bar');
+        $this->assertEquals($get['xxxxxx']['goofy'], 'mickey');
+        $this->assertEquals($get['xxxxxx']['donald'], 'daisy');
+        
+        $get = $m->findBy(['foo' => 'bar', 'donald' => 'daisy']);
+        $this->assertCount(1, $get);
+        $this->assertEquals($get['xxxxxx']['foo'], 'bar');
+        $this->assertEquals($get['xxxxxx']['goofy'], 'mickey');
+        $this->assertEquals($get['xxxxxx']['donald'], 'daisy');
+        $get = $m->findBy(['unknown' => 'daisy']);
+        $this->assertCount(0, $get);
     }
 }
