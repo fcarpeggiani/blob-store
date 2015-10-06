@@ -6,3 +6,4 @@ php:
  - '7'
  - hhvm
 install: composer install
+script: phpunit -c phpunit.xml --bootstrap testbootstrap.php test
