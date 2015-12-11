@@ -24,7 +24,7 @@ class BlobStoreTest extends PHPUnit_Framework_TestCase
 
         $config = new Configuration();
         $connectionParams = array(
-            'url' => 'sqlite:///:memory:',
+            'url' => 'sqlite::memory:',
         );
         $conn = DriverManager::getConnection($connectionParams, $config);
         $conn->executeUpdate(file_get_contents(__DIR__ . '/../../metadata_db.sql'));
@@ -65,7 +65,7 @@ class BlobStoreTest extends PHPUnit_Framework_TestCase
     {
         $config = new Configuration();
         $connectionParams = array(
-            'url' => 'sqlite:///:memory:',
+            'url' => 'sqlite::memory:',
         );
         $conn = DriverManager::getConnection($connectionParams, $config);
         $conn->executeUpdate(file_get_contents(__DIR__ . '/../../metadata_db.sql'));
