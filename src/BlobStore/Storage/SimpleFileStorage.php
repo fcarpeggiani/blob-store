@@ -27,7 +27,11 @@ class SimpleFileStorage implements StorageInterface
 
     public function __construct($prefix, $nestingLevel = 0)
     {
-        assert($prefix != '' && is_writable($prefix), "$prefix is not writable by current user");
+        assert($prefix != '' && $prefix != DIRECTORY_SEPARATOR, "$prefix must be not null and different from root");
+        if (!file_exists($prefix)) {
+            @mkdir($prefix, 0777, TRUE);
+        }
+        assert(is_dir($prefix) && is_writable($prefix), "$prefix must be a writable directory!");
         $this->prefix = $prefix;
         $this->nestingLevel = $nestingLevel;
     }

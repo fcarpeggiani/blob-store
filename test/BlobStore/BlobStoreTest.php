@@ -138,4 +138,13 @@ class BlobStoreTest extends PHPUnit_Framework_TestCase
         $blobs = $store->findBy(['extension' => 'php']);        
         $this->assertTrue(count($blobs) >= 6);
     }
+
+    /**
+     * @test
+     */
+    public function createsPrefixDirIfNotExists()
+    {
+        $storage = new SimpleFileStorage($this->dataDir . DIRECTORY_SEPARATOR . "pdf", 3);
+        
+    }
 }
