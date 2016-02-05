@@ -90,4 +90,9 @@ class SimpleFileStorage implements StorageInterface
         // don't open the file now, file descriptors are not infinite!
         return new LazyOpenStream($filename, 'r');
     }
+
+    public function getLocalFilename($storageKey)
+    {
+        return $this->prefix . DIRECTORY_SEPARATOR . $storageKey;
+    }
 }

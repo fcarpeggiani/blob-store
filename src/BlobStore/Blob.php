@@ -24,6 +24,13 @@ class Blob
      */
     private $metadata = [];
 
+    /**
+     * If supported by storage
+     *
+     * @var string
+     */
+    private $localFilename;
+
     function getId()
     {
         return $this->id;
@@ -57,6 +64,11 @@ class Blob
         return $this->metadata;
     }
 
+    function getLocalFilename()
+    {
+        return $this->localFilename;
+    }
+
     function setId($id)
     {
         $this->id = $id;
@@ -72,5 +84,9 @@ class Blob
         $this->metadata = $metadata;
     }
 
+    function setLocalFilename($v)
+    {
+        $this->localFilename = $v;
+    }
 
 }

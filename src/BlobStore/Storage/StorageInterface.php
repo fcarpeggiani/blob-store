@@ -26,4 +26,13 @@ interface StorageInterface
      * @return StreamInterface
      */
     public function getData($storageKey);
+
+    /**
+     * Returns a local accessible filename if supported
+     *
+     * @param string $storageKey
+     *
+     * @return string
+     */
+    public function getLocalFilename($storageKey);
 }

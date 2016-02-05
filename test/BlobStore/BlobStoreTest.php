@@ -115,6 +115,27 @@ class BlobStoreTest extends PHPUnit_Framework_TestCase
     /**
      * @test
      */
+    public function localFilenameSupported()
+    {
+        $store = $this->store;
+
+        $f = fopen(__FILE__, 'r');
+        $blob = $store->put($f, ['foo' => 'bar']);
+        $expectedLocalFilename = $this->dataDir . DIRECTORY_SEPARATOR . $blob->getMetadata()[DefaultBlobStore::STORAGE_KEY_ATTR];
+        $this->assertEquals($expectedLocalFilename, $blob->getLocalFilename());
+
+        $blob = $store->get($blob->getId());
+        $this->assertEquals($expectedLocalFilename, $blob->getLocalFilename());
+
+        $blob = $store->findBy(['foo' => 'bar'])[0];
+        $this->assertEquals($expectedLocalFilename, $blob->getLocalFilename());
+
+        unlink($this->dataDir . DIRECTORY_SEPARATOR . $blob->getMetadata()[DefaultBlobStore::STORAGE_KEY_ATTR]);
+    }
+
+    /**
+     * @test
+     */
     public function defaultStoreFind()
     {
         $store = $this->store;

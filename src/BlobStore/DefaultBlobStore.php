@@ -13,7 +13,16 @@ class DefaultBlobStore implements BlobStoreInterface
 {
     const STORAGE_KEY_ATTR = 'blob-store.storage-key';
 
+    /**
+     *
+     * @var Storage\StorageInterface
+     */
     private $storage;
+
+    /**
+     *
+     * @var Metadata\MetadataRepoInterface
+     */
     private $metadataRepo;
 
     public function __construct($storage, $metadataRepo)
@@ -34,7 +43,8 @@ class DefaultBlobStore implements BlobStoreInterface
         $blob->setId($uuid);
         $blob->setDataAsPsr7Stream($data);
         $blob->setMetadata($metadata);
-        
+        $blob->setLocalFilename($this->storage->getLocalFilename($storageKey));
+
         return $blob;
     }
 
@@ -51,6 +61,7 @@ class DefaultBlobStore implements BlobStoreInterface
             $blob->setId($id);
             $blob->setDataAsPsr7Stream($data);
             $blob->setMetadata($metadata);
+            $blob->setLocalFilename($this->storage->getLocalFilename($metadata[self::STORAGE_KEY_ATTR]));
 
             return $blob;
         }
@@ -76,7 +87,8 @@ class DefaultBlobStore implements BlobStoreInterface
             $blob->setId($uuid);
             $blob->setMetadata($metadata);
             $blob->setDataAsPsr7Stream($data);
-
+            $blob->setLocalFilename($this->storage->getLocalFilename($metadata[self::STORAGE_KEY_ATTR]));
+            
             $ret[] = $blob;
         }
         return $ret;
