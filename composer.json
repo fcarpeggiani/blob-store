@@ -1,10 +1,10 @@
 {
-    "name": "davide-romanini/blob-store",
+    "name": "fcarpeggiani/blob-store",
     "description": "Simple binary object store abstraction",
     "authors": [
         {
-            "name": "Davide Romanini",
-            "email": "davide.romanini@gmail.com"
+            "name": "Federico Carpeggiani",
+            "email": "federico.carpeggiani@gmail.com"
         }
     ],
     "require": {
